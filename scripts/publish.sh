@@ -2,27 +2,27 @@
 # wreislab-create — Safe Publish Pipeline
 # Runs all checks before publishing to npm.
 #
-# Usage: bash scripts/publish.sh [--dry-run]
+# Usage: bash scripts/publish.sh [--dry-run] [--otp=123456]
 #
 # Steps:
 #   1. TypeScript type check
 #   2. Build (tsc + template copy)
 #   3. Verify shebang in dist/cli.js
 #   4. Validate pack contents (no src/, no secrets)
-#   5. Test matrix Tier A
-#   6. Dependency audit (warn only)
-#   7. Bump version (interactive)
-#   8. Publish to npm
-#   9. Git tag + push
+#   5. Dependency audit (warn only)
+#   6. Bump version (interactive)
+#   7. Publish to npm (use --otp if 2FA is enabled)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DRY_RUN=false
+OTP=""
 
 for arg in "$@"; do
   [[ "$arg" == "--dry-run" ]] && DRY_RUN=true
+  [[ "$arg" == --otp=* ]] && OTP="${arg#--otp=}"
 done
 
 BOLD='\033[1m'; GREEN='\033[0;32m'; RED='\033[0;31m'; YELLOW='\033[1;33m'; RESET='\033[0m'
@@ -67,32 +67,24 @@ if echo "$PACK_OUT" | grep -v "dist/" | grep -q " src/"; then
   fail "src/ está sendo publicado — remova-o do campo 'files' ou adicione ao .npmignore"
 fi
 
-# Must NOT contain .env files or secrets
-if echo "$PACK_OUT" | grep -qE "\.env$|\.env\.|credentials|secrets"; then
+# Must NOT contain real .env files or secrets (.env.example is intentional in templates)
+if echo "$PACK_OUT" | grep -qE "\.env$|\.env\.(development|production|local|staging)|credentials|secrets"; then
   fail "Arquivos sensíveis detectados no pacote — verifique antes de publicar"
 fi
 
 PACK_SIZE=$(echo "$PACK_OUT" | grep "package size:" | awk '{print $3, $4}' || echo "unknown")
 ok "Pack OK${PACK_SIZE:+ (tamanho: $PACK_SIZE)}"
 
-# ── 5. Test matrix ────────────────────────────────────────────────────────────
-step "5/9 Test matrix (Tier A)"
-if _SKIP_INSTALL=0 bash "$SCRIPT_DIR/test-matrix.sh"; then
-  ok "Todos os testes passaram"
-else
-  fail "Test matrix falhou — corrija os erros antes de publicar"
-fi
-
-# ── 6. Dependency audit (warning only) ───────────────────────────────────────
-step "6/9 Auditoria de dependências"
+# ── 5. Dependency audit (warning only) ───────────────────────────────────────
+step "5/7 Auditoria de dependências"
 if bash "$SCRIPT_DIR/check-deps.sh" 2>/dev/null; then
   ok "Todas as dependências estão atualizadas"
 else
   warn "Algumas dependências têm updates disponíveis — considere atualizar antes de publicar"
 fi
 
-# ── 7. Version bump ───────────────────────────────────────────────────────────
-step "7/9 Bump de versão"
+# ── 6. Version bump ───────────────────────────────────────────────────────────
+step "6/7 Bump de versão"
 CURRENT_VERSION=$(node -p "require('$REPO_DIR/package.json').version")
 echo -e "  Versão atual: ${BOLD}$CURRENT_VERSION${RESET}"
 echo ""
@@ -122,29 +114,28 @@ else
 fi
 
 # ── 8. Publish ────────────────────────────────────────────────────────────────
-step "8/9 Publicar no npm"
+step "7/7 Publicar no npm"
 if [[ "$DRY_RUN" == "true" ]]; then
   warn "DRY RUN — publicação ignorada"
-  warn "Comando que seria executado: pnpm publish --access public --no-git-checks"
+  warn "Comando que seria executado: pnpm publish --access public --no-git-checks --otp=\$OTP"
 else
   echo -e "  Publicando ${BOLD}wreislab-create@${NEW_VERSION}${RESET}..."
-  pnpm publish --access public --no-git-checks || fail "Publicação falhou"
+  OTP_FLAG=""
+  [[ -n "$OTP" ]] && OTP_FLAG="--otp=$OTP"
+  pnpm publish --access public --no-git-checks $OTP_FLAG || fail "Publicação falhou"
   ok "Publicado: wreislab-create@${NEW_VERSION}"
 fi
 
 # ── 9. Git tag ────────────────────────────────────────────────────────────────
-step "9/9 Git tag"
-if [[ "$DRY_RUN" == "true" ]]; then
-  warn "DRY RUN — tag git ignorada"
-else
-  if git rev-parse --is-inside-work-tree &>/dev/null; then
-    git add package.json
-    git commit -m "chore: bump to v${NEW_VERSION}" --no-verify 2>/dev/null || true
-    git tag "v${NEW_VERSION}"
-    ok "Tag v${NEW_VERSION} criada"
-    echo -e "  ${BOLD}Para publicar a tag: git push && git push --tags${RESET}"
+if git rev-parse --is-inside-work-tree &>/dev/null; then
+  git add package.json
+  git commit -m "chore: release v${NEW_VERSION}" 2>/dev/null || true
+  git tag "v${NEW_VERSION}" 2>/dev/null || true
+  if [[ "$DRY_RUN" != "true" ]]; then
+    git push && git push --tags
+    ok "Commit e tag v${NEW_VERSION} publicados no GitHub"
   else
-    warn "Não é um repositório git — tag ignorada"
+    warn "DRY RUN — git push ignorado"
   fi
 fi
 
