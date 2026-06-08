@@ -1,0 +1,12 @@
+{
+  "name": "nestjs-ai",
+  "files": ["docs/ai.md"],
+  "packagePatch": "package.patch.json",
+  "workspacePatch": "workspace.patch.yaml",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { AiModule } from './ai/ai.module';"],
+    "modules": ["AiModule"],
+    "providers": []
+  }
+}

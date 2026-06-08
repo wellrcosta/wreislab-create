@@ -1,0 +1,12 @@
+{
+  "name": "nestjs-db-mysql",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { DatabaseModule } from './database/database.module';"],
+    "modules": ["DatabaseModule"],
+    "providers": []
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "nestjs-webhook",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "appModulePatch": {
+    "imports": ["import { WebhookModule } from './webhook/webhook.module';"],
+    "modules": ["WebhookModule"],
+    "providers": []
+  }
+}

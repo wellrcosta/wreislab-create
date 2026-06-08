@@ -1,0 +1,12 @@
+{
+  "name": "nestjs-rabbitmq",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { QueueModule } from './queue/queue.module';"],
+    "modules": ["QueueModule"],
+    "providers": []
+  }
+}

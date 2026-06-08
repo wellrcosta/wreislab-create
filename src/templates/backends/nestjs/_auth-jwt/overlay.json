@@ -1,0 +1,6 @@
+{
+  "name": "nestjs-auth-jwt",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "react-auth-oidc",
+  "files": [
+    "docker-entrypoint.sh"
+  ],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appRoutePatch": {
+    "imports": [
+      "import { AuthCallbackPage } from '@/pages/AuthCallbackPage';",
+      "import { LoginPage } from '@/pages/LoginPage';",
+      "import { LogoutPage } from '@/pages/LogoutPage';",
+      "import { ProtectedRoute } from '@/auth/ProtectedRoute';",
+      "import { ProfilePage } from '@/pages/ProfilePage';"
+    ],
+    "topLevelRoutes": [
+      "<Route path=\"/auth/callback\" element={<AuthCallbackPage />} />"
+    ],
+    "layoutRoutes": [
+      "<Route path=\"/login\" element={<LoginPage />} />",
+      "<Route path=\"/logout\" element={<LogoutPage />} />",
+      "<Route element={<ProtectedRoute />}>",
+      "  <Route path=\"/profile\" element={<ProfilePage />} />",
+      "</Route>"
+    ]
+  }
+}

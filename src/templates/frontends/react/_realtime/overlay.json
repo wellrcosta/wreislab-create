@@ -1,0 +1,23 @@
+{
+  "name": "react-realtime",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "appRoutePatch": {
+    "imports": [
+      "import { RealtimePage } from '@/pages/RealtimePage';"
+    ],
+    "layoutRoutes": [
+      "<Route path=\"/realtime\" element={<RealtimePage />} />"
+    ]
+  },
+  "homePagePatch": {
+    "imports": [
+      "import { Link } from 'react-router-dom';"
+    ],
+    "links": [
+      "<Link to=\"/realtime\" className=\"rounded-md bg-foreground px-4 py-2 text-sm text-background\">",
+      "  Open Real-time Chat",
+      "</Link>"
+    ]
+  }
+}

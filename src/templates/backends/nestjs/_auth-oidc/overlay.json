@@ -1,0 +1,6 @@
+{
+  "name": "nestjs-auth-oidc",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch"
+}

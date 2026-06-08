@@ -1,0 +1,12 @@
+{
+  "name": "nestjs-cache-dragonfly",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { AppCacheModule } from './cache/cache.module';"],
+    "modules": ["AppCacheModule"],
+    "providers": []
+  }
+}

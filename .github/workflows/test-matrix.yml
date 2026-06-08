@@ -1,0 +1,43 @@
+name: Test Matrix
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-tier-a:
+    name: Tier A — Sem Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install CLI dependencies
+        run: pnpm install
+
+      - name: Build CLI
+        run: pnpm build
+
+      - name: Run test matrix (Tier A — no Docker)
+        run: bash scripts/test-matrix.sh
+        timeout-minutes: 25
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: /tmp/wreislab-test-matrix/**/.test-*.log
+          retention-days: 7

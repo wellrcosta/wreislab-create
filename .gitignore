@@ -1,0 +1,14 @@
+dist/**/*
+node_modules/**/*
+*.log
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+*.bak
+.claude
+build/
+coverage/
+*.swp
+*.swo
+*.env.development

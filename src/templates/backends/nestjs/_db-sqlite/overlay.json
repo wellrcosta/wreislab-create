@@ -1,0 +1,11 @@
+{
+  "name": "nestjs-db-sqlite",
+  "files": ["pnpm-workspace.yaml", "Dockerfile"],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { DatabaseModule } from './database/database.module';"],
+    "modules": ["DatabaseModule"],
+    "providers": []
+  }
+}

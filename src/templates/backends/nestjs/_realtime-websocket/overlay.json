@@ -1,0 +1,11 @@
+{
+  "name": "nestjs-websocket",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appModulePatch": {
+    "imports": ["import { EventsModule } from './gateway/events.module';"],
+    "modules": ["EventsModule"],
+    "providers": []
+  }
+}

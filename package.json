@@ -1,0 +1,35 @@
+{
+  "name": "wreislab-create",
+  "version": "0.1.0",
+  "description": "Interactive CLI to scaffold WReisLab project templates",
+  "bin": {
+    "wreislab-create": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && rm -rf dist/templates && cp -r src/templates dist/templates",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js",
+    "publish:safe": "bash scripts/publish.sh"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "deepmerge": "^4.3.1",
+    "fs-extra": "^11.3.5",
+    "js-yaml": "^4.2.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": ["ts-jest", {
+      "isolatedModules": true,
+      "tsconfig": {
+        "module": "commonjs",
+        "esModuleInterop": true
+      }
+    }]
+  },
+  "transformIgnorePatterns": [
+    "node_modules/.pnpm/(?!(jose|jwks-rsa)@)"
+  ]
+}

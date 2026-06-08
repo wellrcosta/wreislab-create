@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node10",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src/*.ts", "src/merger/*.ts", "src/presets.ts", "src/prompts.ts", "src/generator.ts", "src/types.ts", "src/cli.ts"],
+  "exclude": ["node_modules", "dist", "src/templates"]
+}
