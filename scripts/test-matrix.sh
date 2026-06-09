@@ -234,7 +234,7 @@ echo -e "  Docker: $WITH_DOCKER"
 mkdir -p "$TEST_ROOT"
 
 echo ""
-echo -e "${BOLD}── Tier A — Sem Docker ─────────────────────${NC}"
+echo -e "${BOLD}── Tier A — No Docker ──────────────────────${NC}"
 #          ID     name        preset        auth    db       cache  queue  realtime             frontend
 run_test  "T01"  "base-app"  "quick"       "none"  "none"   "none" "none" "none"               "none"
 run_test  "T02"  "db-app"    "quick"       "none"  "sqlite" "none" "none" "none"               "none"
@@ -278,7 +278,7 @@ echo -e "${BOLD}── Tier A — Add Mode ────────────�
     echo "FAIL:no-wreislab-json" > "$TEST_ROOT/T10-add/result"
     exit 1
   fi
-  ok ".wreislab.json presente"
+  ok ".wreislab.json present"
 
   # Apply add-feature for sqlite
   _SKIP_INSTALL=1 node -e "
@@ -297,13 +297,13 @@ echo -e "${BOLD}── Tier A — Add Mode ────────────�
     echo "FAIL:no-database-dir" > "$TEST_ROOT/T10-add/result"
     exit 1
   fi
-  ok "src/database/ presente após add"
+  ok "src/database/ present after add"
 
   # Verify .wreislab.json updated
   local DB_VAL
   DB_VAL=$(node -p "require('$ADD_OUT/.wreislab.json').database" 2>/dev/null || echo "unknown")
   if [[ "$DB_VAL" == "sqlite" ]]; then
-    ok ".wreislab.json atualizado: database=sqlite"
+    ok ".wreislab.json updated: database=sqlite"
   else
     fail "T10: .wreislab.json database=$DB_VAL (expected sqlite)"
     echo "FAIL:bad-wreislab-json" > "$TEST_ROOT/T10-add/result"
@@ -316,7 +316,7 @@ echo -e "${BOLD}── Tier A — Add Mode ────────────�
 
 if [[ "$WITH_DOCKER" == "true" ]]; then
   echo ""
-  echo -e "${BOLD}── Tier B — Com Docker ─────────────────────${NC}"
+  echo -e "${BOLD}── Tier B — With Docker ────────────────────${NC}"
   run_test  "T11"  "pg-app"    "quick"       "none"  "postgres" "none"      "none"     "none"      "none"
   run_test  "T12"  "pg-redis"  "crud"        "jwt"   "postgres" "redis"     "none"     "none"      "none"
   run_test  "T13"  "mysql-df"  "oidc-full"   "oidc"  "mysql"    "dragonfly" "none"     "none"      "none"
@@ -329,7 +329,7 @@ fi
 # FINAL REPORT
 # ═══════════════════════════════════════════════════════════════════════════════
 echo ""
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━ RESULTADO FINAL ━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━ FINAL RESULTS ━━━━━━━━━━━━━━━${NC}"
 echo ""
 
 PASS_COUNT=0; FAIL_COUNT=0

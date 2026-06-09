@@ -20,17 +20,17 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
   p.intro('WReisLab Template Generator');
 
   const name = await p.text({
-    message: 'Nome do projeto?',
+    message: 'Project name?',
     placeholder: 'my-app',
     validate: (v: string) => {
-      if (!v) return 'Nome é obrigatório';
-      if (!/^[a-z0-9-_]+$/.test(v)) return 'Use apenas letras minúsculas, números, - ou _';
+      if (!v) return 'Name is required';
+      if (!/^[a-z0-9-_]+$/.test(v)) return 'Use only lowercase letters, numbers, - or _';
     },
   });
   if (p.isCancel(name)) process.exit(0);
 
   const presetId = await p.select<PresetId>({
-    message: 'Escolha um preset (ponto de partida):',
+    message: 'Choose a preset (starting point):',
     options: PRESETS.map((pr) => ({
       value: pr.id,
       label: pr.label,
@@ -42,7 +42,7 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
   const preset = PRESETS.find((pr) => pr.id === presetId)!;
   const d = preset.defaults;
 
-  p.note('Personalize os addons — qualquer combinação é válida', 'Configuração');
+  p.note('Customize your addons — any combination is valid', 'Configuration');
 
   const isFrontendOnly = presetId === 'frontend-only';
   const isApiOnly = presetId === 'api-only';
@@ -58,13 +58,13 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
 
   if (!isFrontendOnly) {
     const backendAns = await p.select<BackendOption>({
-      message: 'Linguagem / framework do backend?',
+      message: 'Backend language / framework?',
       options: [
-        { value: 'nestjs', label: 'NestJS (TypeScript)', hint: 'disponível' },
-        { value: 'spring', label: 'Java / Spring Boot', hint: 'em breve' },
-        { value: 'dotnet', label: '.NET', hint: 'em breve' },
-        { value: 'go', label: 'Go (Gin / Chi)', hint: 'em breve' },
-        { value: 'python', label: 'Python (FastAPI)', hint: 'em breve' },
+        { value: 'nestjs', label: 'NestJS (TypeScript)', hint: 'available' },
+        { value: 'dotnet', label: '.NET 8', hint: 'coming soon' },
+        { value: 'go', label: 'Go (Gin / Chi)', hint: 'coming soon' },
+        { value: 'spring', label: 'Java / Spring Boot', hint: 'coming soon' },
+        { value: 'python', label: 'Python (FastAPI)', hint: 'coming soon' },
       ],
       initialValue: backend,
     });
@@ -72,11 +72,11 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     backend = backendAns;
 
     const authAns = await p.select<AuthOption>({
-      message: 'Autenticação?',
+      message: 'Authentication?',
       options: [
-        { value: 'none', label: 'Sem autenticação' },
-        { value: 'oidc', label: 'OIDC (Pocket ID / Keycloak / qualquer provider)' },
-        { value: 'jwt', label: 'JWT simples (secret local, sem JWKS)' },
+        { value: 'none', label: 'None' },
+        { value: 'oidc', label: 'OIDC (Pocket ID / Keycloak / any provider)' },
+        { value: 'jwt', label: 'Simple JWT (local secret, no JWKS)' },
       ],
       initialValue: auth,
     });
@@ -84,12 +84,12 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     auth = authAns;
 
     const dbAns = await p.select<DatabaseOption>({
-      message: 'Banco de dados?',
+      message: 'Database?',
       options: [
-        { value: 'none', label: 'Nenhum' },
+        { value: 'none', label: 'None' },
         { value: 'postgres', label: 'PostgreSQL (TypeORM)' },
         { value: 'mysql', label: 'MySQL (TypeORM)' },
-        { value: 'sqlite', label: 'SQLite (TypeORM — sem container extra)' },
+        { value: 'sqlite', label: 'SQLite (TypeORM — no extra container)' },
         { value: 'mongo', label: 'MongoDB (Mongoose)' },
       ],
       initialValue: database,
@@ -100,9 +100,9 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     const cacheAns = await p.select<CacheOption>({
       message: 'Cache?',
       options: [
-        { value: 'none', label: 'Nenhum' },
+        { value: 'none', label: 'None' },
         { value: 'redis', label: 'Redis' },
-        { value: 'dragonfly', label: 'Dragonfly (Redis-compatible, mais rápido)' },
+        { value: 'dragonfly', label: 'Dragonfly (Redis-compatible, faster)' },
       ],
       initialValue: cache,
     });
@@ -110,9 +110,9 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     cache = cacheAns;
 
     const queueAns = await p.select<QueueOption>({
-      message: 'Fila / Mensageria?',
+      message: 'Queue / Messaging?',
       options: [
-        { value: 'none', label: 'Nenhuma' },
+        { value: 'none', label: 'None' },
         { value: 'rabbitmq', label: 'RabbitMQ (producer + consumer)' },
       ],
       initialValue: queue,
@@ -121,10 +121,10 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     queue = queueAns;
 
     const aiAns = await p.select<AiOption>({
-      message: 'Integração de IA?',
+      message: 'AI integration?',
       options: [
-        { value: 'none', label: 'Não' },
-        { value: 'multi', label: 'Sim — multi-provider (NVIDIA free, OpenAI, Claude, Gemini, DeepSeek)' },
+        { value: 'none', label: 'None' },
+        { value: 'multi', label: 'Yes — multi-provider (NVIDIA free, OpenAI, Claude, Gemini, DeepSeek)' },
       ],
       initialValue: ai,
     });
@@ -132,10 +132,10 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     ai = aiAns;
 
     const realtimeAns = await p.multiselect<'websocket' | 'webhook'>({
-      message: 'Comunicação em tempo real? (pode selecionar ambos)',
+      message: 'Real-time communication? (select any combination)',
       options: [
-        { value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push para frontend' },
-        { value: 'webhook', label: 'Webhook (endpoint receptor de eventos HTTP)' },
+        { value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push events to frontend' },
+        { value: 'webhook', label: 'Webhook (HTTP endpoint to receive external events)' },
       ],
       initialValues: realtime,
       required: false,
@@ -148,8 +148,8 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     const frontendAns = await p.select<FrontendOption>({
       message: 'Frontend?',
       options: [
-        { value: 'react', label: 'React (shadcn/ui + TanStack Query)', hint: 'disponível' },
-        { value: 'none', label: 'Sem frontend (API pura)' },
+        { value: 'react', label: 'React (shadcn/ui + TanStack Query)', hint: 'available' },
+        { value: 'none', label: 'None (API only)' },
       ],
       initialValue: frontend,
     });
@@ -171,9 +171,9 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
   }
 
   const pkgMgr = await p.select<PackageManager>({
-    message: 'Gerenciador de pacotes?',
+    message: 'Package manager?',
     options: [
-      { value: 'pnpm', label: 'pnpm', hint: 'recomendado' },
+      { value: 'pnpm', label: 'pnpm', hint: 'recommended' },
       { value: 'npm', label: 'npm' },
       { value: 'yarn', label: 'yarn' },
     ],
@@ -198,37 +198,37 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
 }
 
 export async function runAddPrompts(cwd: string, existing: SavedProjectConfig): Promise<AddConfig> {
-  p.intro(`Adicionar feature a "${existing.name}"`);
+  p.intro(`Add feature to "${existing.name}"`);
 
   type FeatureChoice = 'database' | 'cache' | 'queue' | 'websocket' | 'webhook' | 'ai';
   const options: { value: FeatureChoice; label: string; hint?: string }[] = [];
 
   if (existing.database === 'none') {
-    options.push({ value: 'database', label: 'Banco de dados' });
+    options.push({ value: 'database', label: 'Database' });
   }
   if (existing.cache === 'none') {
     options.push({ value: 'cache', label: 'Cache (Redis / Dragonfly)' });
   }
   if (existing.queue === 'none') {
-    options.push({ value: 'queue', label: 'Fila — RabbitMQ' });
+    options.push({ value: 'queue', label: 'Queue — RabbitMQ' });
   }
   if (!existing.realtime.includes('websocket')) {
-    options.push({ value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push para frontend' });
+    options.push({ value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push events to frontend' });
   }
   if (!existing.realtime.includes('webhook')) {
-    options.push({ value: 'webhook', label: 'Webhook (endpoint receptor de eventos HTTP)' });
+    options.push({ value: 'webhook', label: 'Webhook (HTTP endpoint for external events)' });
   }
   if ((existing.ai ?? 'none') === 'none') {
-    options.push({ value: 'ai', label: 'Integração de IA (NVIDIA free, OpenAI, Claude, Gemini, DeepSeek)' });
+    options.push({ value: 'ai', label: 'AI integration (NVIDIA free, OpenAI, Claude, Gemini, DeepSeek)' });
   }
 
   if (options.length === 0) {
-    p.outro('Todas as features disponíveis já estão ativadas neste projeto.');
+    p.outro('All available features are already active in this project.');
     process.exit(0);
   }
 
   const featureAns = await p.select<FeatureChoice>({
-    message: 'Qual feature deseja adicionar?',
+    message: 'Which feature do you want to add?',
     options,
   });
   if (p.isCancel(featureAns)) process.exit(0);
@@ -238,11 +238,11 @@ export async function runAddPrompts(cwd: string, existing: SavedProjectConfig): 
 
   if (feature === 'database') {
     const dbAns = await p.select<Exclude<DatabaseOption, 'none'>>({
-      message: 'Qual banco de dados?',
+      message: 'Which database?',
       options: [
         { value: 'postgres', label: 'PostgreSQL (TypeORM)' },
         { value: 'mysql', label: 'MySQL (TypeORM)' },
-        { value: 'sqlite', label: 'SQLite (TypeORM — sem container extra)' },
+        { value: 'sqlite', label: 'SQLite (TypeORM — no extra container)' },
         { value: 'mongo', label: 'MongoDB (Mongoose)' },
       ],
     });
@@ -252,10 +252,10 @@ export async function runAddPrompts(cwd: string, existing: SavedProjectConfig): 
 
   if (feature === 'cache') {
     const cacheAns = await p.select<Exclude<CacheOption, 'none'>>({
-      message: 'Qual cache?',
+      message: 'Which cache?',
       options: [
         { value: 'redis', label: 'Redis' },
-        { value: 'dragonfly', label: 'Dragonfly (Redis-compatible, mais rápido)' },
+        { value: 'dragonfly', label: 'Dragonfly (Redis-compatible, faster)' },
       ],
     });
     if (p.isCancel(cacheAns)) process.exit(0);
@@ -263,9 +263,9 @@ export async function runAddPrompts(cwd: string, existing: SavedProjectConfig): 
   }
 
   const pkgMgr = await p.select<PackageManager>({
-    message: 'Gerenciador de pacotes?',
+    message: 'Package manager?',
     options: [
-      { value: 'pnpm', label: 'pnpm', hint: 'recomendado' },
+      { value: 'pnpm', label: 'pnpm', hint: 'recommended' },
       { value: 'npm', label: 'npm' },
       { value: 'yarn', label: 'yarn' },
     ],

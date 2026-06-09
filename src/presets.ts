@@ -3,8 +3,8 @@ import type { Preset } from './types.js';
 export const PRESETS: Preset[] = [
   {
     id: 'quick',
-    label: 'App Rápido',
-    hint: 'Sem auth, sem banco — pronto para codar',
+    label: 'Quick App',
+    hint: 'No auth, no database — start coding immediately',
     defaults: {
       backend: 'nestjs',
       auth: 'none',
@@ -19,8 +19,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'crud',
-    label: 'CRUD Simples',
-    hint: 'Auth + banco, o básico de um serviço',
+    label: 'Simple CRUD',
+    hint: 'Auth + database — the baseline for most services',
     defaults: {
       backend: 'nestjs',
       auth: 'jwt',
@@ -35,8 +35,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'full-oidc',
-    label: 'App Completo OIDC',
-    hint: 'OIDC + banco + cache, tudo configurado e seguro',
+    label: 'Full OIDC App',
+    hint: 'OIDC + database + cache — production-ready from day one',
     defaults: {
       backend: 'nestjs',
       auth: 'oidc',
@@ -51,8 +51,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'realtime',
-    label: 'Dados em Tempo Real',
-    hint: 'WebSocket para updates ao vivo no frontend',
+    label: 'Real-Time Data',
+    hint: 'WebSocket for live updates to the frontend',
     defaults: {
       backend: 'nestjs',
       auth: 'none',
@@ -67,8 +67,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'api-only',
-    label: 'API Pura',
-    hint: 'Backend sem frontend gerado',
+    label: 'API Only',
+    hint: 'Backend without a generated frontend',
     defaults: {
       backend: 'nestjs',
       auth: 'none',
@@ -83,8 +83,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'frontend-only',
-    label: 'Frontend Puro',
-    hint: 'SPA React sem backend gerado',
+    label: 'Frontend Only',
+    hint: 'React SPA without a generated backend',
     defaults: {
       backend: 'nestjs',
       auth: 'none',
@@ -99,8 +99,8 @@ export const PRESETS: Preset[] = [
   },
   {
     id: 'custom',
-    label: 'Customizado',
-    hint: 'Definir tudo manualmente',
+    label: 'Custom',
+    hint: 'Choose everything manually',
     defaults: {
       backend: 'nestjs',
       auth: 'none',

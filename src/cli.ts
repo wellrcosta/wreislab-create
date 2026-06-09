@@ -33,24 +33,24 @@ async function main(): Promise<void> {
     const addConfig = await runAddPrompts(cwd, existing);
 
     const spinner = p.spinner();
-    spinner.start('Aplicando feature...');
+    spinner.start('Applying feature...');
 
     try {
       await addFeature(addConfig, existing, cwd);
-      spinner.stop('Feature adicionada com sucesso!');
+      spinner.stop('Feature added successfully!');
     } catch (err) {
-      spinner.stop('Erro ao adicionar feature');
+      spinner.stop('Failed to add feature');
       p.log.error(String(err));
       process.exit(1);
     }
 
     p.outro(
       [
-        pc.bold('Feature adicionada!'),
+        pc.bold('Feature added!'),
         '',
-        pc.dim('Próximos passos:'),
-        '  cp .env.example .env   # adicione as novas variáveis',
-        '  docker compose up -d   # sobe infraestrutura (se necessário)',
+        pc.dim('Next steps:'),
+        '  cp .env.example .env   # fill in the new variables',
+        '  docker compose up -d   # start infrastructure (if needed)',
       ].join('\n'),
     );
     return;
@@ -60,13 +60,13 @@ async function main(): Promise<void> {
   const config = await runPrompts(cwd);
 
   const spinner = p.spinner();
-  spinner.start('Gerando projeto...');
+  spinner.start('Generating project...');
 
   try {
     await generate(config);
-    spinner.stop('Projeto gerado com sucesso!');
+    spinner.stop('Project generated successfully!');
   } catch (err) {
-    spinner.stop('Erro ao gerar projeto');
+    spinner.stop('Failed to generate project');
     p.log.error(String(err));
     process.exit(1);
   }
@@ -74,15 +74,15 @@ async function main(): Promise<void> {
   const projectPath = config.preset === 'api-only' || config.frontend === 'none' ? config.name : `${config.name}/backend`;
   p.outro(
     [
-      pc.bold(`Projeto pronto em ./${config.name}`),
+      pc.bold(`Project ready at ./${config.name}`),
       '',
-      pc.dim('Próximos passos:'),
+      pc.dim('Next steps:'),
       `  cd ${projectPath}`,
-      '  cp .env.example .env   # ajuste as variáveis',
-      '  docker compose up -d   # sobe infraestrutura (se houver)',
+      '  cp .env.example .env   # fill in your variables',
+      '  docker compose up -d   # start infrastructure (if any)',
       `  ${config.packageManager} run start:dev`,
       '',
-      pc.dim('Para produção: pnpm run build && pnpm run start:prod'),
+      pc.dim('For production: pnpm run build && pnpm run start:prod'),
     ].join('\n'),
   );
 }

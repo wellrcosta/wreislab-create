@@ -38,7 +38,7 @@ print_header() {
   echo -e "\n${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════╗${RESET}"
   echo -e "${BOLD}${CYAN}║   wreislab-create — Dependency Audit (>7 days stability gate) ║${RESET}"
   echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════╝${RESET}"
-  [[ -n "$FORCE_PACKAGES" ]] && echo -e "  ${YELLOW}⚡ Gate bypass ativo para: ${FORCE_PACKAGES}${RESET}"
+  [[ -n "$FORCE_PACKAGES" ]] && echo -e "  ${YELLOW}⚡ Gate bypass active for: ${FORCE_PACKAGES}${RESET}"
   echo ""
 }
 
@@ -109,7 +109,7 @@ check_pkg() {
 
   # Check if latest is > 7 days old (skip gate for forced packages)
   if [[ "$is_forced" == "false" && "$age_days" -lt 7 ]] 2>/dev/null; then
-    echo -e "  ${YELLOW}⏳${RESET} ${pkg} ${range} → ${latest} (${age_days}d old — AGUARDAR >7 dias)"
+    echo -e "  ${YELLOW}⏳${RESET} ${pkg} ${range} → ${latest} (${age_days}d old — WAIT >7 days)"
     ((WAITING++)) || true
     return
   fi
@@ -123,7 +123,7 @@ check_pkg() {
   [[ "$is_forced" == "true" && "$age_days" -lt 7 ]] && _force_tag=" ⚡ FORÇADO (${age_days}d)"
 
   if [[ "$latest_major" -gt "$declared_major" ]] 2>/dev/null; then
-    echo -e "  ${RED}↑ MAJOR${RESET} ${pkg} ${range} → ^${latest}${_force_tag} — breaking change, verificar manualmente | ${src}"
+    echo -e "  ${RED}↑ MAJOR${RESET} ${pkg} ${range} → ^${latest}${_force_tag} — breaking change, verify manually | ${src}"
     ((OUTDATED++)) || true
   else
     echo -e "  ${YELLOW}↑${RESET} ${pkg} ${range} → ^${latest}${_force_tag} | ${src}"
@@ -179,17 +179,17 @@ for f in "${FILES[@]}"; do
 done
 
 echo ""
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━ RESULTADO ━━━━━━━━━━━━━${RESET}"
-echo -e "  ${GREEN}✓ Atualizados:${RESET}  $UPTODATE"
-echo -e "  ${YELLOW}↑ Pendentes:${RESET}   $OUTDATED"
-echo -e "  ${YELLOW}⏳ Aguardar:${RESET}    $WAITING  (< 7 dias)"
-[[ $ERRORS -gt 0 ]] && echo -e "  ${YELLOW}? Erros:${RESET}       $ERRORS"
+echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━ RESULTS ━━━━━━━━━━━━━${RESET}"
+echo -e "  ${GREEN}✓ Up to date:${RESET}  $UPTODATE"
+echo -e "  ${YELLOW}↑ Outdated:${RESET}    $OUTDATED"
+echo -e "  ${YELLOW}⏳ Waiting:${RESET}     $WAITING  (< 7 days)"
+[[ $ERRORS -gt 0 ]] && echo -e "  ${YELLOW}? Errors:${RESET}      $ERRORS"
 echo ""
 
 if [[ $OUTDATED -gt 0 ]]; then
-  echo -e "${YELLOW}${BOLD}Existem $OUTDATED dependência(s) com updates disponíveis.${RESET}"
+  echo -e "${YELLOW}${BOLD}$OUTDATED dependency/dependencies have updates available.${RESET}"
   exit 1
 else
-  echo -e "${GREEN}${BOLD}Todas as dependências estão atualizadas ou aguardando estabilização.${RESET}"
+  echo -e "${GREEN}${BOLD}All dependencies are up to date or waiting for stabilization.${RESET}"
   exit 0
 fi

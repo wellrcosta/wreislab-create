@@ -154,7 +154,7 @@ export async function generate(config: ProjectConfig): Promise<void> {
     for (const overlay of overlays) {
       const overlayDir = path.join(backendTemplateBase, overlay);
       if (!(await fs.pathExists(overlayDir))) {
-        p.log.warn(`Overlay "${overlay}" ainda não implementado — pulando`);
+        p.log.warn(`Overlay "${overlay}" not yet implemented — skipping`);
         continue;
       }
       const { appModulePatch } = await applyOverlay(overlayDir, backendDir);
@@ -202,7 +202,7 @@ export async function generate(config: ProjectConfig): Promise<void> {
     for (const overlay of overlays) {
       const overlayDir = path.join(frontendTemplateBase, overlay);
       if (!(await fs.pathExists(overlayDir))) {
-        p.log.warn(`Overlay "${overlay}" ainda não implementado — pulando`);
+        p.log.warn(`Overlay "${overlay}" not yet implemented — skipping`);
         continue;
       }
       const { appRoutePatch, homePagePatch } = await applyOverlay(overlayDir, frontendDir);
@@ -218,7 +218,7 @@ export async function generate(config: ProjectConfig): Promise<void> {
 
   // --- Install deps ---
   if (process.env._SKIP_INSTALL !== '1') {
-    p.log.step('Instalando dependências...');
+    p.log.step('Installing dependencies...');
 
     if (!isFrontendOnly && (await fs.pathExists(path.join(outputDir, 'backend', 'package.json')))) {
       installDeps(path.join(outputDir, 'backend'), packageManager);
@@ -250,11 +250,11 @@ export async function addFeature(add: AddConfig, existing: SavedProjectConfig, c
 
   const overlayDir = path.join(backendTemplateBase, overlayName);
   if (!(await fs.pathExists(overlayDir))) {
-    p.log.error(`Overlay "${overlayName}" não encontrado — feature ainda não implementada.`);
+    p.log.error(`Overlay "${overlayName}" not found — feature not yet implemented.`);
     process.exit(1);
   }
 
-  p.log.step(`Aplicando overlay "${overlayName}"...`);
+  p.log.step(`Applying overlay "${overlayName}"...`);
   const { appModulePatch } = await applyOverlay(overlayDir, backendDir);
   if (appModulePatch) {
     await patchAppModule(path.join(backendDir, 'src', 'app.module.ts'), [appModulePatch]);
@@ -286,7 +286,7 @@ export async function addFeature(add: AddConfig, existing: SavedProjectConfig, c
   }
 
   if (process.env._SKIP_INSTALL !== '1') {
-    p.log.step('Instalando dependências...');
+    p.log.step('Installing dependencies...');
     installDeps(backendDir, add.packageManager);
   }
 }

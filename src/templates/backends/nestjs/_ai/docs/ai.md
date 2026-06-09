@@ -1,12 +1,12 @@
 # AI Integration
 
-Este módulo expõe um serviço de IA multi-provider via `AiService` e dois endpoints HTTP.
+This module exposes a multi-provider AI service via `AiService` and two HTTP endpoints.
 
 ---
 
-## Providers suportados
+## Supported providers
 
-| `AI_PROVIDER` | Provedor | SDK | Modelo padrão |
+| `AI_PROVIDER` | Provider | SDK | Default model |
 |---|---|---|---|
 | `nvidia` (default) | NVIDIA NIM | `openai` | `google/gemma-4-31b-it` |
 | `openai` | OpenAI | `openai` | `gpt-4o-mini` |
@@ -15,20 +15,20 @@ Este módulo expõe um serviço de IA multi-provider via `AiService` e dois endp
 | `groq` | Groq | `openai` | `llama-3.3-70b-versatile` |
 | `anthropic` | Claude (Anthropic) | `@anthropic-ai/sdk` | `claude-haiku-4-5` |
 | `gemini` | Google Gemini | `@google/genai` | `gemini-2.0-flash` |
-| `custom` | Qualquer endpoint OpenAI-compatible | `openai` | `llama3` |
+| `custom` | Any OpenAI-compatible endpoint | `openai` | `llama3` |
 
-Para trocar de provider, edite `AI_PROVIDER` no `.env` — nenhum código precisa mudar.
+To switch providers, change `AI_PROVIDER` in `.env` — no code changes needed.
 
 ---
 
-## Obter API key grátis (NVIDIA NIM)
+## Get a free API key (NVIDIA NIM)
 
-1. Acesse [https://build.nvidia.com](https://build.nvidia.com)
-2. Crie uma conta e gere uma API key
-3. Defina `NVIDIA_API_KEY=nvapi-...` no `.env`
-4. Explore os modelos disponíveis em [https://build.nvidia.com/explore/discover](https://build.nvidia.com/explore/discover)
+1. Go to [https://build.nvidia.com](https://build.nvidia.com)
+2. Create an account and generate an API key
+3. Set `NVIDIA_API_KEY=nvapi-...` in `.env`
+4. Browse available models at [https://build.nvidia.com/explore/discover](https://build.nvidia.com/explore/discover)
 
-Modelos gratuitos recomendados:
+Recommended free models:
 - `google/gemma-4-31b-it`
 - `meta/llama-4-scout-17b-16e-instruct`
 - `deepseek-ai/deepseek-r1`
@@ -36,11 +36,11 @@ Modelos gratuitos recomendados:
 
 ---
 
-## Variáveis de ambiente
+## Environment variables
 
 ```env
-AI_PROVIDER=nvidia        # provider ativo
-AI_MODEL=                 # sobrescreve o modelo padrão (opcional)
+AI_PROVIDER=nvidia        # active provider
+AI_MODEL=                 # override the default model (optional)
 
 NVIDIA_API_KEY=nvapi-...
 OPENAI_API_KEY=sk-...
@@ -50,26 +50,26 @@ DEEPSEEK_API_KEY=...
 KIMI_API_KEY=...
 GROQ_API_KEY=...
 
-# Para provider=custom (qualquer endpoint OpenAI-compatible)
+# For provider=custom (any OpenAI-compatible endpoint)
 AI_BASE_URL=https://api.example.com/v1
 AI_API_KEY=...
 ```
 
 ---
 
-## Endpoints HTTP
+## HTTP endpoints
 
 ### POST /ai/chat
 
-Resposta completa (não-streaming).
+Full response (non-streaming).
 
 ```bash
 curl -X POST http://localhost:3000/ai/chat \
   -H 'Content-Type: application/json' \
   -d '{
     "messages": [
-      { "role": "system", "content": "Você é um assistente útil." },
-      { "role": "user", "content": "Explique o que é NestJS em uma frase." }
+      { "role": "system", "content": "You are a helpful assistant." },
+      { "role": "user", "content": "Explain what NestJS is in one sentence." }
     ],
     "options": {
       "maxTokens": 200,
@@ -78,10 +78,10 @@ curl -X POST http://localhost:3000/ai/chat \
   }'
 ```
 
-Resposta:
+Response:
 ```json
 {
-  "content": "NestJS é um framework Node.js progressivo...",
+  "content": "NestJS is a progressive Node.js framework...",
   "model": "google/gemma-4-31b-it",
   "provider": "nvidia",
   "usage": {
@@ -94,25 +94,25 @@ Resposta:
 
 ### POST /ai/chat/stream
 
-Server-Sent Events (SSE) — cada chunk chega em tempo real.
+Server-Sent Events (SSE) — each chunk arrives in real time.
 
 ```bash
 curl -X POST http://localhost:3000/ai/chat/stream \
   -H 'Content-Type: application/json' \
-  -d '{"messages":[{"role":"user","content":"Olá!"}]}'
+  -d '{"messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
-Formato de cada evento:
+Event format:
 ```
-data: {"content":"Olá"}
-data: {"content":"! Como"}
-data: {"content":" posso ajudar?"}
+data: {"content":"Hello"}
+data: {"content":"! How"}
+data: {"content":" can I help you?"}
 data: [DONE]
 ```
 
 ---
 
-## Usando `AiService` em outros módulos
+## Using `AiService` in other modules
 
 ```typescript
 import { AiService } from './ai/ai.service';
@@ -123,7 +123,7 @@ export class MyService {
 
   async summarize(text: string): Promise<string> {
     const response = await this.ai.chat([
-      { role: 'system', content: 'Resuma o texto em até 3 frases.' },
+      { role: 'system', content: 'Summarize the text in up to 3 sentences.' },
       { role: 'user', content: text },
     ]);
     return response.content;
@@ -135,11 +135,11 @@ export class MyService {
 }
 ```
 
-Como `AiModule` é exportado e importado via `AppModule`, basta injetar `AiService` diretamente.
+Since `AiModule` is exported and imported via `AppModule`, you can inject `AiService` directly into any module.
 
 ---
 
-## Consumindo SSE no frontend (React)
+## Consuming SSE on the frontend (React)
 
 ```typescript
 async function streamChat(message: string, onChunk: (text: string) => void) {
