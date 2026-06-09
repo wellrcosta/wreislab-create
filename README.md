@@ -61,13 +61,13 @@ It reads `.wreislab.json` in your project root and shows only the features not y
 
 | Preset | What you get |
 |--------|-------------|
-| **App Rápido** | NestJS + React, no auth, no database — start coding immediately |
-| **CRUD Simples** | JWT auth + PostgreSQL + React — the baseline for most services |
-| **App Completo OIDC** | OIDC + PostgreSQL + Redis + React — production-ready from day one |
-| **Dados em Tempo Real** | WebSocket (Socket.io) + React — live updates out of the box |
-| **API Pura** | Backend only, no frontend generated |
-| **Frontend Puro** | React SPA only, no backend generated |
-| **Customizado** | Choose everything manually |
+| **Quick App** | NestJS + React, no auth, no database — start coding immediately |
+| **Simple CRUD** | JWT auth + PostgreSQL + React — the baseline for most services |
+| **Full OIDC App** | OIDC + PostgreSQL + Redis + React — production-ready from day one |
+| **Real-Time Data** | WebSocket (Socket.io) + React — live updates out of the box |
+| **API Only** | Backend only, no frontend generated |
+| **Frontend Only** | React SPA only, no backend generated |
+| **Custom** | Choose everything manually |
 
 ---
 
