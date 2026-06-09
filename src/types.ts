@@ -5,7 +5,7 @@ export type QueueOption = 'none' | 'rabbitmq';
 export type AiOption = 'none' | 'multi';
 export type RealtimeOption = ('websocket' | 'webhook')[];
 export type FrontendOption = 'react' | 'none';
-export type BackendOption = 'nestjs' | 'spring' | 'dotnet' | 'go' | 'python';
+export type BackendOption = 'nestjs' | 'bun' | 'spring' | 'dotnet' | 'go' | 'python';
 export type PackageManager = 'pnpm' | 'npm' | 'yarn';
 
 export type PresetId =

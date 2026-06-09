@@ -33,7 +33,7 @@ The CLI will guide you through:
 
 1. **Project name**
 2. **Preset** — a starting point (see presets below)
-3. **Backend framework** — NestJS is available now; more coming
+3. **Backend framework** — NestJS and Bun available now; more coming
 4. **Auth** — None / OIDC / JWT
 5. **Database** — None / PostgreSQL / MySQL / SQLite / MongoDB
 6. **Cache** — None / Redis / Dragonfly
@@ -64,7 +64,7 @@ It reads `.wreislab.json` in your project root and shows only the features not y
 | **Quick App** | NestJS + React, no auth, no database — start coding immediately |
 | **Simple CRUD** | JWT auth + PostgreSQL + React — the baseline for most services |
 | **Full OIDC App** | OIDC + PostgreSQL + Redis + React — production-ready from day one |
-| **Real-Time Data** | WebSocket (Socket.io) + React — live updates out of the box |
+| **Real-Time Data** | WebSocket + React — live updates with auto-reconnect out of the box |
 | **API Only** | Backend only, no frontend generated |
 | **Frontend Only** | React SPA only, no backend generated |
 | **Custom** | Choose everything manually |
@@ -82,9 +82,9 @@ It reads `.wreislab.json` in your project root and shows only the features not y
 ### Database
 | Option | Details |
 |--------|---------|
-| `postgres` | PostgreSQL via TypeORM |
-| `mysql` | MySQL via TypeORM |
-| `sqlite` | SQLite via TypeORM — no container needed |
+| `postgres` | PostgreSQL via TypeORM (NestJS) / Drizzle + postgres.js (Bun) |
+| `mysql` | MySQL via TypeORM (NestJS) / Drizzle + mysql2 (Bun) |
+| `sqlite` | SQLite via TypeORM (NestJS) / Drizzle + bun:sqlite (Bun) — no container needed |
 | `mongo` | MongoDB via Mongoose |
 
 ### Cache
@@ -122,8 +122,8 @@ See `docs/ai.md` in the generated project for usage examples and how to get a fr
 ### Realtime
 | Option | Details |
 |--------|---------|
-| `websocket` | Socket.io gateway — push events to frontend |
-| `webhook` | HTTP endpoint to receive external events |
+| `websocket` | Native WebSocket (RFC 6455) with rooms support and auto-reconnect on the client |
+| `webhook` | HTTP endpoint to receive external events with HMAC signature verification |
 
 ---
 
@@ -141,6 +141,18 @@ See `docs/ai.md` in the generated project for usage examples and how to get a fr
 - **Metrics**: Prometheus-compatible at `/metrics`
 - **Testing**: Jest + Supertest (unit + e2e)
 
+### Backend (Bun)
+- **Runtime**: Bun ≥ 1.1
+- **Framework**: Elysia 1.4
+- **Language**: TypeScript (Bun-native bundler, no `tsc` build step)
+- **Validation**: Zod v4
+- **ORM**: Drizzle ORM (postgres.js / mysql2 / bun:sqlite built-in)
+- **Linting/formatting**: Biome
+- **Logging**: pino + pino-pretty
+- **Docs**: Swagger UI at `/docs` (via @elysiajs/swagger)
+- **Metrics**: Prometheus-compatible at `/metrics` (prom-client)
+- **Testing**: Bun test (built-in, Jest-compatible)
+
 ### Frontend (React)
 - **Bundler**: Vite 8
 - **Language**: TypeScript 6
@@ -157,7 +169,8 @@ See `docs/ai.md` in the generated project for usage examples and how to get a fr
 
 | Tool | Minimum version |
 |------|----------------|
-| Node.js | 22.0.0 (CLI) / 26.0.0 (generated projects) |
+| Node.js | 22.0.0 (CLI) / 26.0.0 (generated NestJS projects) |
+| Bun | 1.1.0 (generated Bun projects) |
 | pnpm | 9.0.0 |
 | Docker | any recent version (only for infra addons) |
 
@@ -165,12 +178,13 @@ See `docs/ai.md` in the generated project for usage examples and how to get a fr
 
 ## Roadmap
 
-The current release covers NestJS + React. The plan is to expand one framework at a time, in this order:
+The current release covers NestJS + Bun + React. The plan is to expand one framework at a time, in this order:
 
 ### Backends
+- [x] **NestJS** — NestJS 11 + Fastify 5, all addons
+- [x] **Bun** — Elysia 1.4 + Drizzle ORM, all addons
 - [ ] **.NET 8** — ASP.NET Core, Entity Framework, all addons
 - [ ] **Go** — Gin or Chi, GORM, all addons
-- [ ] **Bun** — Elysia or Hono, TypeScript-native runtime
 - [ ] **Spring Boot** — Java 21, Spring Data, Spring Security
 - [ ] **Python** — FastAPI, SQLAlchemy, async-first
 - [ ] **Ruby on Rails** — full-stack template (back + front in one, Hotwire/Turbo)

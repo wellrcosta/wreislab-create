@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { getSocket } from '@/lib/socket';
+import { createWsClient } from '@/lib/ws-client';
 
 interface Message {
   id: number;
-  event: string;
   data: unknown;
   timestamp: string;
 }
@@ -14,33 +13,21 @@ export function LiveFeed() {
   const counterRef = useRef(0);
 
   useEffect(() => {
-    const socket = getSocket();
-
-    const onConnect = () => setConnected(true);
-    const onDisconnect = () => setConnected(false);
-    const onMessage = (data: unknown) => {
-      setMessages((prev) => [
-        {
-          id: ++counterRef.current,
-          event: 'message',
-          data,
-          timestamp: new Date().toISOString(),
-        },
-        ...prev.slice(0, 49),
-      ]);
-    };
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('message', onMessage);
-
-    if (socket.connected) setConnected(true);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('message', onMessage);
-    };
+    const client = createWsClient({
+      onConnect: () => setConnected(true),
+      onDisconnect: () => setConnected(false),
+      onMessage: (data) => {
+        setMessages((prev) => [
+          {
+            id: ++counterRef.current,
+            data,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.slice(0, 49),
+        ]);
+      },
+    });
+    return () => client.close();
   }, []);
 
   return (
@@ -48,7 +35,7 @@ export function LiveFeed() {
       <div className="flex items-center gap-2">
         <div className={`h-2 w-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
         <span className="text-sm text-muted-foreground">
-          {connected ? 'Connected' : 'Disconnected'}
+          {connected ? 'Connected' : 'Reconnecting...'}
         </span>
       </div>
 

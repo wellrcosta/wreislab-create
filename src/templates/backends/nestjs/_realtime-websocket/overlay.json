@@ -1,8 +1,12 @@
 {
   "name": "nestjs-websocket",
-  "files": [],
+  "files": ["test/app.e2e-spec.ts"],
   "packagePatch": "package.patch.json",
   "envPatch": "env.patch",
+  "mainPatch": {
+    "imports": ["import { WsAdapter } from '@nestjs/platform-ws';"],
+    "setup": ["app.useWebSocketAdapter(new WsAdapter(app));"]
+  },
   "appModulePatch": {
     "imports": ["import { EventsModule } from './gateway/events.module';"],
     "modules": ["EventsModule"],

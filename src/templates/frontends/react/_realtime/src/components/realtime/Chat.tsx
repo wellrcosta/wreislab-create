@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getSocket } from '@/lib/socket';
+import { createWsClient, type WsClient } from '@/lib/ws-client';
 
 interface ChatMessage {
   id: number;
@@ -14,27 +14,19 @@ export function Chat() {
   const [connected, setConnected] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef(0);
+  const clientRef = useRef<WsClient | null>(null);
 
   useEffect(() => {
-    const socket = getSocket();
-
-    const onConnect = () => setConnected(true);
-    const onDisconnect = () => setConnected(false);
-    const onMessage = (data: Omit<ChatMessage, 'id'>) => {
-      setMessages((prev) => [...prev, { ...data, id: ++counterRef.current }]);
-    };
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('message', onMessage);
-
-    if (socket.connected) setConnected(true);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('message', onMessage);
-    };
+    const client = createWsClient({
+      onConnect: () => setConnected(true),
+      onDisconnect: () => setConnected(false),
+      onMessage: (data) => {
+        const msg = data as Omit<ChatMessage, 'id'>;
+        setMessages((prev) => [...prev, { ...msg, id: ++counterRef.current }]);
+      },
+    });
+    clientRef.current = client;
+    return () => client.close();
   }, []);
 
   useEffect(() => {
@@ -44,7 +36,7 @@ export function Chat() {
   const send = () => {
     const text = input.trim();
     if (!text || !connected) return;
-    getSocket().emit('message', { text });
+    clientRef.current?.send({ text });
     setInput('');
   };
 
@@ -54,7 +46,7 @@ export function Chat() {
         <div className={`h-2 w-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
         <span className="text-sm font-medium">Real-time Chat</span>
         <span className="text-xs text-muted-foreground ml-auto">
-          {connected ? 'Connected' : 'Disconnected'}
+          {connected ? 'Connected' : 'Reconnecting...'}
         </span>
       </div>
 
@@ -87,7 +79,7 @@ export function Chat() {
       <div className="flex gap-2 p-3 border-t">
         <input
           className="flex-1 rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-50"
-          placeholder={connected ? 'Type a message...' : 'Connecting...'}
+          placeholder={connected ? 'Type a message...' : 'Reconnecting...'}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}

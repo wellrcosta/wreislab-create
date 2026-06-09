@@ -7,7 +7,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'ws';
+import type { WebSocket } from 'ws';
+import { WsManagerService } from './ws-manager.service';
+
+interface WsClient extends WebSocket {
+  id: string;
+}
 
 export interface ChatMessage {
   from: string;
@@ -15,31 +21,41 @@ export interface ChatMessage {
   type: 'user' | 'bot';
 }
 
-@WebSocketGateway({
-  cors: { origin: process.env.WS_CORS_ORIGIN ?? 'http://localhost:5173' },
-})
+@WebSocketGateway({ path: '/ws' })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
-  handleConnection(client: Socket): void {
-    console.log(`Client connected: ${client.id}`);
+  constructor(private readonly wsManager: WsManagerService) {}
+
+  handleConnection(client: WsClient): void {
+    client.id = Math.random().toString(36).slice(2, 10);
   }
 
-  handleDisconnect(client: Socket): void {
-    console.log(`Client disconnected: ${client.id}`);
+  handleDisconnect(_client: WsClient): void {
+    // to leave a room: this.wsManager.leave(room, client)
   }
 
   @SubscribeMessage('message')
   handleMessage(
     @MessageBody() data: { text: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: WsClient,
   ): void {
-    this.server.emit('message', { from: client.id, text: data.text, type: 'user' } satisfies ChatMessage);
-    this.server.emit('message', { from: 'server', text: `Received: ${data.text}`, type: 'bot' } satisfies ChatMessage);
+    const userMsg: ChatMessage = { from: client.id, text: data.text, type: 'user' };
+    const botMsg: ChatMessage = { from: 'server', text: `Received: ${data.text}`, type: 'bot' };
+    this.server.clients.forEach((c) => {
+      if (c.readyState === 1) {
+        c.send(JSON.stringify(userMsg));
+        c.send(JSON.stringify(botMsg));
+      }
+    });
   }
 
-  broadcast(event: string, data: unknown): void {
-    this.server.emit(event, data);
+  broadcast(data: unknown): void {
+    this.wsManager.broadcastAll(data);
+  }
+
+  broadcastToRoom(room: string, data: unknown): void {
+    this.wsManager.broadcast(room, data);
   }
 }

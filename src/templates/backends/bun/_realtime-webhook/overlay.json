@@ -1,0 +1,9 @@
+{
+  "name": "bun-webhook",
+  "files": [],
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { webhookPlugin } from './plugins/webhook';"],
+    "plugins": [".use(webhookPlugin)"]
+  }
+}

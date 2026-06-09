@@ -172,6 +172,17 @@ FILES=(
   "$REPO_DIR/src/templates/frontends/react/_base/package.json"
   "$REPO_DIR/src/templates/frontends/react/_auth-oidc/package.patch.json"
   "$REPO_DIR/src/templates/frontends/react/_realtime/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_base/package.json"
+  "$REPO_DIR/src/templates/backends/bun/_auth-jwt/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_auth-oidc/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_db-postgres/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_db-mysql/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_db-sqlite/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_db-mongo/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_cache-redis/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_cache-dragonfly/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_msg-rabbitmq/package.patch.json"
+  "$REPO_DIR/src/templates/backends/bun/_ai/package.patch.json"
 )
 
 for f in "${FILES[@]}"; do

@@ -1,0 +1,12 @@
+{
+  "name": "bun-base",
+  "files": [
+    "package.json",
+    "tsconfig.json",
+    "Dockerfile",
+    "docker-compose.yml",
+    ".env.example",
+    ".gitignore",
+    ".github/workflows/docker-publish.yml"
+  ]
+}

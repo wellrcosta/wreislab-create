@@ -1,0 +1,10 @@
+{
+  "name": "bun-db-sqlite",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { dbPlugin } from './plugins/db';"],
+    "plugins": [".use(dbPlugin)"]
+  }
+}

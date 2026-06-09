@@ -1,0 +1,10 @@
+{
+  "name": "bun-ai",
+  "files": ["docs/ai.md"],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { aiPlugin } from './plugins/ai';"],
+    "plugins": [".use(aiPlugin)"]
+  }
+}

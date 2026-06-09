@@ -6,6 +6,8 @@ import { appendEnvPatch } from './merger/env.js';
 import { mergeDockerCompose, mergePnpmWorkspace, generateInfraCompose } from './merger/yaml.js';
 import { mergePackageJson } from './merger/json.js';
 import { patchAppModule, type AppModulePatch as _AppModulePatch } from './merger/app-module.js';
+import { patchElysiaApp, type AppPluginPatch as _AppPluginPatch } from './merger/elysia-app.js';
+import { patchMain, type MainPatch as _MainPatch } from './merger/main-patch.js';
 import {
   patchAppRoutes,
   patchHomePage,
@@ -24,18 +26,22 @@ interface OverlayManifest {
   workspacePatch?: string;
   envPatch?: string;
   appModulePatch?: _AppModulePatch;
+  appPluginPatch?: _AppPluginPatch;
+  mainPatch?: _MainPatch;
   appRoutePatch?: _AppRoutePatch;
   homePagePatch?: _HomePagePatch;
 }
 
 interface OverlayPatches {
   appModulePatch: _AppModulePatch | null;
+  appPluginPatch: _AppPluginPatch | null;
+  mainPatch: _MainPatch | null;
   appRoutePatch: _AppRoutePatch | null;
   homePagePatch: _HomePagePatch | null;
 }
 
 async function applyOverlay(overlayDir: string, targetDir: string): Promise<OverlayPatches> {
-  const none: OverlayPatches = { appModulePatch: null, appRoutePatch: null, homePagePatch: null };
+  const none: OverlayPatches = { appModulePatch: null, appPluginPatch: null, mainPatch: null, appRoutePatch: null, homePagePatch: null };
   const manifestPath = path.join(overlayDir, 'overlay.json');
   if (!(await fs.pathExists(manifestPath))) return none;
 
@@ -94,6 +100,8 @@ async function applyOverlay(overlayDir: string, targetDir: string): Promise<Over
 
   return {
     appModulePatch: manifest.appModulePatch ?? null,
+    appPluginPatch: manifest.appPluginPatch ?? null,
+    mainPatch: manifest.mainPatch ?? null,
     appRoutePatch: manifest.appRoutePatch ?? null,
     homePagePatch: manifest.homePagePatch ?? null,
   };
@@ -134,6 +142,11 @@ function installDeps(dir: string, pkgMgr: string): void {
   execSync(cmd, { cwd: dir, stdio: 'inherit' });
 }
 
+function backendInstallDeps(dir: string, config: ProjectConfig): void {
+  const pkgMgr = config.backend === 'bun' ? 'bun' : config.packageManager;
+  installDeps(dir, pkgMgr);
+}
+
 export async function generate(config: ProjectConfig): Promise<void> {
   const { outputDir, packageManager } = config;
   const isApiOnly = config.preset === 'api-only' || config.frontend === 'none';
@@ -151,17 +164,26 @@ export async function generate(config: ProjectConfig): Promise<void> {
     p.log.step(`Backend: ${config.backend} (${overlays.slice(1).join(', ') || 'base'})...`);
 
     const appModulePatches: _AppModulePatch[] = [];
+    const appPluginPatches: _AppPluginPatch[] = [];
+    const mainPatches: _MainPatch[] = [];
     for (const overlay of overlays) {
       const overlayDir = path.join(backendTemplateBase, overlay);
       if (!(await fs.pathExists(overlayDir))) {
         p.log.warn(`Overlay "${overlay}" not yet implemented — skipping`);
         continue;
       }
-      const { appModulePatch } = await applyOverlay(overlayDir, backendDir);
+      const { appModulePatch, appPluginPatch, mainPatch } = await applyOverlay(overlayDir, backendDir);
       if (appModulePatch) appModulePatches.push(appModulePatch);
+      if (appPluginPatch) appPluginPatches.push(appPluginPatch);
+      if (mainPatch) mainPatches.push(mainPatch);
     }
 
-    await patchAppModule(path.join(backendDir, 'src', 'app.module.ts'), appModulePatches);
+    if (config.backend === 'bun') {
+      await patchElysiaApp(path.join(backendDir, 'src', 'app.ts'), appPluginPatches);
+    } else {
+      await patchAppModule(path.join(backendDir, 'src', 'app.module.ts'), appModulePatches);
+      await patchMain(path.join(backendDir, 'src', 'main.ts'), mainPatches);
+    }
 
     const composePath = path.join(backendDir, 'docker-compose.yml');
     if (await fs.pathExists(composePath)) {
@@ -221,9 +243,9 @@ export async function generate(config: ProjectConfig): Promise<void> {
     p.log.step('Installing dependencies...');
 
     if (!isFrontendOnly && (await fs.pathExists(path.join(outputDir, 'backend', 'package.json')))) {
-      installDeps(path.join(outputDir, 'backend'), packageManager);
+      backendInstallDeps(path.join(outputDir, 'backend'), config);
     } else if (await fs.pathExists(path.join(outputDir, 'package.json'))) {
-      installDeps(outputDir, packageManager);
+      backendInstallDeps(outputDir, config);
     }
 
     if (config.frontend !== 'none' && (await fs.pathExists(path.join(outputDir, 'frontend', 'package.json')))) {

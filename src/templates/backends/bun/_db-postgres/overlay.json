@@ -1,0 +1,11 @@
+{
+  "name": "bun-db-postgres",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { dbPlugin } from './plugins/db';"],
+    "plugins": [".use(dbPlugin)"]
+  }
+}

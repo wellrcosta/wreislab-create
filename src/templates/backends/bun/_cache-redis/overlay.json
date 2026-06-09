@@ -1,0 +1,11 @@
+{
+  "name": "bun-cache-redis",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { cachePlugin } from './plugins/cache';"],
+    "plugins": [".use(cachePlugin)"]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "bun-auth-oidc",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { authPlugin } from './plugins/auth';"],
+    "plugins": [".use(authPlugin)"]
+  }
+}

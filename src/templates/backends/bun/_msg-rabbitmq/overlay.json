@@ -1,0 +1,11 @@
+{
+  "name": "bun-rabbitmq",
+  "files": [],
+  "packagePatch": "package.patch.json",
+  "composePatch": "compose.patch.yml",
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { queuePlugin } from './plugins/queue';"],
+    "plugins": [".use(queuePlugin)"]
+  }
+}

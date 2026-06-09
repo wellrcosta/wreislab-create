@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@elysiajs/jwt": "^1.4.2",
+    "@elysiajs/bearer": "^1.4.4"
+  }
+}

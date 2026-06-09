@@ -1,0 +1,9 @@
+{
+  "name": "bun-websocket",
+  "files": [],
+  "envPatch": "env.patch",
+  "appPluginPatch": {
+    "imports": ["import { wsPlugin } from './plugins/ws';"],
+    "plugins": [".use(wsPlugin)"]
+  }
+}

@@ -61,6 +61,7 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
       message: 'Backend language / framework?',
       options: [
         { value: 'nestjs', label: 'NestJS (TypeScript)', hint: 'available' },
+        { value: 'bun', label: 'Bun (TypeScript + Elysia)', hint: 'available' },
         { value: 'dotnet', label: '.NET 8', hint: 'coming soon' },
         { value: 'go', label: 'Go (Gin / Chi)', hint: 'coming soon' },
         { value: 'spring', label: 'Java / Spring Boot', hint: 'coming soon' },
@@ -134,7 +135,7 @@ export async function runPrompts(cwd: string): Promise<ProjectConfig> {
     const realtimeAns = await p.multiselect<'websocket' | 'webhook'>({
       message: 'Real-time communication? (select any combination)',
       options: [
-        { value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push events to frontend' },
+        { value: 'websocket', label: 'WebSocket', hint: 'push events to frontend' },
         { value: 'webhook', label: 'Webhook (HTTP endpoint to receive external events)' },
       ],
       initialValues: realtime,
@@ -213,7 +214,7 @@ export async function runAddPrompts(cwd: string, existing: SavedProjectConfig): 
     options.push({ value: 'queue', label: 'Queue — RabbitMQ' });
   }
   if (!existing.realtime.includes('websocket')) {
-    options.push({ value: 'websocket', label: 'WebSocket (Socket.io)', hint: 'push events to frontend' });
+    options.push({ value: 'websocket', label: 'WebSocket', hint: 'push events to frontend' });
   }
   if (!existing.realtime.includes('webhook')) {
     options.push({ value: 'webhook', label: 'Webhook (HTTP endpoint for external events)' });
